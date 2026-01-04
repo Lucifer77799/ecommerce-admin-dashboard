@@ -13,7 +13,6 @@ export default function NewProductPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
-
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -34,15 +33,36 @@ export default function NewProductPage() {
     }
 
     const data = await res.json();
-    return data.url;
+    return data.url as string;
   }
 
+  // ✅ STEP 1 VALIDATION
+  function validateStep1() {
+    const parsed = productSchema.pick({ name: true }).safeParse({
+      name,
+    });
+
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((e) => {
+        if (e.path[0]) errs[e.path[0].toString()] = e.message;
+      });
+
+      setErrors(errs);
+      return false;
+    }
+
+    setErrors({});
+    return true;
+  }
+
+  // ✅ FINAL SUBMIT
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
 
     if (!imageFile) {
-      alert("Please select an image");
+      setErrors({ image: "Image is required" });
       return;
     }
 
@@ -51,23 +71,15 @@ export default function NewProductPage() {
       description,
       price: Number(price),
       stock: Number(stock),
-      image: "temp",
     });
 
     if (!parsed.success) {
-      const fieldErrors: Record<string, string> = {};
-      const flattened = parsed.error.flatten().fieldErrors;
-
-      (Object.keys(flattened) as Array<
-        keyof typeof flattened
-      >).forEach((key) => {
-        const messages = flattened[key];
-        if (messages && messages.length > 0) {
-          fieldErrors[key] = messages[0];
-        }
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((e) => {
+        if (e.path[0]) errs[e.path[0].toString()] = e.message;
       });
 
-      setErrors(fieldErrors);
+      setErrors(errs);
       return;
     }
 
@@ -83,10 +95,7 @@ export default function NewProductPage() {
         },
         credentials: "include",
         body: JSON.stringify({
-          name,
-          description,
-          price: Number(price),
-          stock: Number(stock),
+          ...parsed.data,
           image: imageUrl,
         }),
       });
@@ -97,7 +106,7 @@ export default function NewProductPage() {
       }
 
       router.push("/dashboard");
-      router.refresh(); 
+      router.refresh();
     } catch {
       alert("Something went wrong");
     } finally {
@@ -107,10 +116,9 @@ export default function NewProductPage() {
 
   return (
     <div className="p-10 max-w-xl">
-      <h1 className="text-2xl font-bold mb-6">
-        Add New Product
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
 
+      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <input
@@ -120,9 +128,7 @@ export default function NewProductPage() {
             onChange={(e) => setName(e.target.value)}
           />
           {errors.name && (
-            <p className="text-red-600 text-sm">
-              {errors.name}
-            </p>
+            <p className="text-red-600 text-sm">{errors.name}</p>
           )}
 
           <textarea
@@ -139,9 +145,12 @@ export default function NewProductPage() {
               setImageFile(e.target.files?.[0] || null)
             }
           />
+          {errors.image && (
+            <p className="text-red-600 text-sm">{errors.image}</p>
+          )}
 
           <button
-            onClick={() => setStep(2)}
+            onClick={() => validateStep1() && setStep(2)}
             className="bg-black text-white px-4 py-2"
           >
             Next
@@ -149,6 +158,7 @@ export default function NewProductPage() {
         </div>
       )}
 
+      {/* STEP 2 */}
       {step === 2 && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -158,6 +168,9 @@ export default function NewProductPage() {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
           />
+          {errors.price && (
+            <p className="text-red-600 text-sm">{errors.price}</p>
+          )}
 
           <input
             type="number"
@@ -166,6 +179,9 @@ export default function NewProductPage() {
             value={stock}
             onChange={(e) => setStock(e.target.value)}
           />
+          {errors.stock && (
+            <p className="text-red-600 text-sm">{errors.stock}</p>
+          )}
 
           <div className="flex gap-3">
             <button

@@ -1,15 +1,9 @@
 import { z } from "zod";
 
 export const productSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Product name must be at least 3 characters"),
+  name: z.string().min(1, "Product name is required"),
   description: z.string().optional(),
-  price: z
-    .number()
-    .positive("Price must be greater than 0"),
-  stock: z
-    .number()
-    .int("Stock must be an integer")
-    .nonnegative("Stock cannot be negative"),
+  price: z.number().min(1, "Price must be greater than 0"),
+  stock: z.number().min(0, "Stock cannot be negative"),
+  image: z.string().optional(),
 });

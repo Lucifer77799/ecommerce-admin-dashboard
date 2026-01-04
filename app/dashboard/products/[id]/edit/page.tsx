@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { productSchema } from "@/lib/validators/product";
 
 export default function EditProductPage({
   params,
@@ -20,6 +21,7 @@ export default function EditProductPage({
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function fetchProduct() {
@@ -53,12 +55,31 @@ export default function EditProductPage({
     }
 
     const data = await res.json();
-    return data.url;
+    return data.url as string;
   }
 
-  // UPDATE PRODUCT
+  // UPDATE PRODUCT (WITH ZOD VALIDATION)
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErrors({});
+
+    const parsed = productSchema.safeParse({
+      name,
+      description,
+      price: Number(price),
+      stock: Number(stock),
+    });
+
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          errs[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setErrors(errs);
+      return;
+    }
 
     let imageToSave = currentImage;
 
@@ -73,10 +94,7 @@ export default function EditProductPage({
       },
       credentials: "include",
       body: JSON.stringify({
-        name,
-        description,
-        price: Number(price),
-        stock: Number(stock),
+        ...parsed.data,
         image: imageToSave,
       }),
     });
@@ -87,7 +105,7 @@ export default function EditProductPage({
     }
 
     router.push("/dashboard");
-    router.refresh(); // ✅ IMPORTANT: refresh SSR data
+    router.refresh();
   }
 
   if (loading) return <p className="p-10">Loading...</p>;
@@ -122,6 +140,9 @@ export default function EditProductPage({
         onChange={(e) => setName(e.target.value)}
         placeholder="Product Name"
       />
+      {errors.name && (
+        <p className="text-red-600 text-sm">{errors.name}</p>
+      )}
 
       <textarea
         className="border p-2 w-full"
@@ -137,6 +158,9 @@ export default function EditProductPage({
         onChange={(e) => setPrice(e.target.value)}
         placeholder="Price"
       />
+      {errors.price && (
+        <p className="text-red-600 text-sm">{errors.price}</p>
+      )}
 
       <input
         type="number"
@@ -145,6 +169,9 @@ export default function EditProductPage({
         onChange={(e) => setStock(e.target.value)}
         placeholder="Stock"
       />
+      {errors.stock && (
+        <p className="text-red-600 text-sm">{errors.stock}</p>
+      )}
 
       <button className="bg-black text-white px-4 py-2">
         Update Product

@@ -142,7 +142,7 @@ These credentials are provided only for demonstration and evaluation purposes.
 
 ### 🌐 Live Demo
 
-🌍 Live Application: https://your-vercel-deployment-link.vercel.app
+🌍 Live Application: https://ecommerce-admin-dashboard-xi.vercel.app/dashboard
 
 🎥 Demo Video: https://your-demo-video-link
 

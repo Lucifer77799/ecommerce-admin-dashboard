@@ -47,10 +47,12 @@ export async function POST(req: Request) {
 
   // AUTH COOKIE
   response.cookies.set("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-  });
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production", 
+  sameSite: "lax",
+  path: "/",
+});
+
 
   // ROLE COOKIE 
   response.cookies.set("role", user.role, {

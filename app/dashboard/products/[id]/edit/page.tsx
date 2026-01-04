@@ -41,17 +41,23 @@ export default function EditProductPage({
 
   //IMAGE UPLOAD 
   async function uploadImage(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    credentials: "include", 
+    body: formData,
+  });
 
-    const data = await res.json();
-    return data.url;
+  if (!res.ok) {
+    throw new Error("Image upload failed");
   }
+
+  const data = await res.json();
+  return data.url;
+}
+
 
   // UPDATE PRODUCT
   async function handleSubmit(e: React.FormEvent) {
@@ -64,22 +70,28 @@ export default function EditProductPage({
       imageToSave = await uploadImage(newImageFile);
     }
 
-    await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        name,
-        description,
-        price: Number(price),
-        stock: Number(stock),
-        image: imageToSave, //  update image if changed
-      }),
-    });
+        const res = await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            name,
+            description,
+            price: Number(price),
+            stock: Number(stock),
+            image: imageToSave,
+        }),
+        });
 
-    router.push("/dashboard");
+        if (!res.ok) {
+        alert("Failed to update product");
+        return;
+        }
+
+        router.push("/dashboard");
+
   }
 
   if (loading) return <p className="p-10">Loading...</p>;

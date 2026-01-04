@@ -65,7 +65,7 @@ All changes are reflected through server-rendered updates to ensure data consist
 - ✅ **Form Validation:** Zod  
 - 🔄 **Data Fetching:**  
   - Server-side data fetching using Next.js  
-  - Client-side data revalidation patterns supported via **React Query or SWR** (as per PS)  
+  - Client-side data revalidation patterns supported via SWR
 - 📈 **Charts & Visualization:** Recharts  
 - 🗄 **Database:** MongoDB  
 - ☁️ **Image Storage:** Cloudinary  
@@ -88,17 +88,20 @@ This architecture ensures both **performance and reliability**, while remaining 
 
 ## ⚙️ Setup Instructions
 
-1️⃣ Clone the Repository
+### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
 ```
 
-2️⃣ Install Dependencies
+
+### 2️⃣ Install Dependencies
 ```bash
 npm install
 ```
-3️⃣ Configure Environment Variables
+
+
+### 3️⃣ Configure Environment Variables
 Create a .env.local file in the root directory:
 
 MONGODB_URI=your_mongodb_connection_string
@@ -114,11 +117,16 @@ NEXTAUTH_SECRET=your_secret
 NEXTAUTH_URL=http://localhost:3000
 
 
-4️⃣ Start the Development Server
+
+
+### 4️⃣ Start the Development Server
 ```bash
 npm run dev
 ```
 Open 👉 http://localhost:3000
+
+---
+
 
 
 ### 🔐 Dummy Admin Credentials (For Demo)
@@ -128,12 +136,18 @@ Password: admin123
 
 These credentials are provided only for demonstration and evaluation purposes.
 
+---
+
+
 
 ### 🌐 Live Demo
 
 🌍 Live Application: https://your-vercel-deployment-link.vercel.app
 
 🎥 Demo Video: https://your-demo-video-link
+
+---
+
 
 ### 📌 Notes
 
@@ -147,4 +161,5 @@ Secure admin dashboards
 
 Data visualization and analytics
 
+---
 

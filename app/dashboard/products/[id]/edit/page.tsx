@@ -69,6 +69,7 @@ export default function EditProductPage({
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         name,
         description,

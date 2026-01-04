@@ -7,21 +7,17 @@ import { productSchema } from "@/lib/validators/product";
 export default function NewProductPage() {
   const router = useRouter();
 
-  
   const [step, setStep] = useState(1);
-
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
 
-  
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
 
   async function uploadImage(file: File) {
     const formData = new FormData();
@@ -29,8 +25,8 @@ export default function NewProductPage() {
 
     const res = await fetch("/api/upload", {
       method: "POST",
+      credentials: "include",
       body: formData,
-      credentials: "include"
     });
 
     if (!res.ok) {
@@ -50,20 +46,21 @@ export default function NewProductPage() {
       return;
     }
 
-    
     const parsed = productSchema.safeParse({
       name,
       description,
       price: Number(price),
       stock: Number(stock),
-      image: "temp", 
+      image: "temp",
     });
 
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       const flattened = parsed.error.flatten().fieldErrors;
 
-      (Object.keys(flattened) as Array<keyof typeof flattened>).forEach((key) => {
+      (Object.keys(flattened) as Array<
+        keyof typeof flattened
+      >).forEach((key) => {
         const messages = flattened[key];
         if (messages && messages.length > 0) {
           fieldErrors[key] = messages[0];
@@ -77,10 +74,8 @@ export default function NewProductPage() {
     setLoading(true);
 
     try {
-      
       const imageUrl = await uploadImage(imageFile);
 
-      
       const res = await fetch("/api/products", {
         method: "POST",
         headers: {
@@ -96,12 +91,14 @@ export default function NewProductPage() {
         }),
       });
 
-      if (res.ok) {
-        router.push("/dashboard");
-      } else {
+      if (!res.ok) {
         alert("Failed to create product");
+        return;
       }
-    } catch (err) {
+
+      router.push("/dashboard");
+      router.refresh(); 
+    } catch {
       alert("Something went wrong");
     } finally {
       setLoading(false);
@@ -114,22 +111,19 @@ export default function NewProductPage() {
         Add New Product
       </h1>
 
-      
       {step === 1 && (
         <div className="space-y-4">
-          <div>
-            <input
-              className="border p-2 w-full"
-              placeholder="Product Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            {errors.name && (
-              <p className="text-red-600 text-sm">
-                {errors.name}
-              </p>
-            )}
-          </div>
+          <input
+            className="border p-2 w-full"
+            placeholder="Product Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          {errors.name && (
+            <p className="text-red-600 text-sm">
+              {errors.name}
+            </p>
+          )}
 
           <textarea
             className="border p-2 w-full"
@@ -138,48 +132,16 @@ export default function NewProductPage() {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-       
-          <div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setImageFile(e.target.files?.[0] || null)
-              }
-            />
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setImageFile(e.target.files?.[0] || null)
+            }
+          />
 
           <button
-            onClick={() => {
-              setErrors({});
-
-              const parsed = productSchema.safeParse({
-                name,
-                description,
-                price: 1,
-                stock: 0,
-                image: "temp",
-              });
-
-              if (!parsed.success) {
-                const fieldErrors: Record<string, string> = {};
-                const flattened = parsed.error.flatten().fieldErrors;
-
-                (Object.keys(flattened) as Array<
-                  keyof typeof flattened
-                >).forEach((key) => {
-                  const messages = flattened[key];
-                  if (messages && messages.length > 0) {
-                    fieldErrors[key] = messages[0];
-                  }
-                });
-
-                setErrors(fieldErrors);
-                return;
-              }
-
-              setStep(2);
-            }}
+            onClick={() => setStep(2)}
             className="bg-black text-white px-4 py-2"
           >
             Next
@@ -187,38 +149,23 @@ export default function NewProductPage() {
         </div>
       )}
 
-      
       {step === 2 && (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="number"
-              className="border p-2 w-full"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
-            {errors.price && (
-              <p className="text-red-600 text-sm">
-                {errors.price}
-              </p>
-            )}
-          </div>
+          <input
+            type="number"
+            className="border p-2 w-full"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
 
-          <div>
-            <input
-              type="number"
-              className="border p-2 w-full"
-              placeholder="Stock"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-            />
-            {errors.stock && (
-              <p className="text-red-600 text-sm">
-                {errors.stock}
-              </p>
-            )}
-          </div>
+          <input
+            type="number"
+            className="border p-2 w-full"
+            placeholder="Stock"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+          />
 
           <div className="flex gap-3">
             <button

@@ -16,13 +16,11 @@ export default function EditProductPage({
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
 
-  
   const [currentImage, setCurrentImage] = useState("");
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(true);
 
-  
   useEffect(() => {
     async function fetchProduct() {
       const res = await fetch(`/api/products/${id}`);
@@ -32,32 +30,31 @@ export default function EditProductPage({
       setDescription(data.description || "");
       setPrice(String(data.price));
       setStock(String(data.stock));
-      setCurrentImage(data.image); // existing image
+      setCurrentImage(data.image);
       setLoading(false);
     }
 
     fetchProduct();
   }, [id]);
 
-  //IMAGE UPLOAD 
+  // IMAGE UPLOAD
   async function uploadImage(file: File) {
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    credentials: "include", 
-    body: formData,
-  });
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-  if (!res.ok) {
-    throw new Error("Image upload failed");
+    if (!res.ok) {
+      throw new Error("Image upload failed");
+    }
+
+    const data = await res.json();
+    return data.url;
   }
-
-  const data = await res.json();
-  return data.url;
-}
-
 
   // UPDATE PRODUCT
   async function handleSubmit(e: React.FormEvent) {
@@ -65,33 +62,32 @@ export default function EditProductPage({
 
     let imageToSave = currentImage;
 
-   
     if (newImageFile) {
       imageToSave = await uploadImage(newImageFile);
     }
 
-        const res = await fetch(`/api/products/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-            name,
-            description,
-            price: Number(price),
-            stock: Number(stock),
-            image: imageToSave,
-        }),
-        });
+    const res = await fetch(`/api/products/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        name,
+        description,
+        price: Number(price),
+        stock: Number(stock),
+        image: imageToSave,
+      }),
+    });
 
-        if (!res.ok) {
-        alert("Failed to update product");
-        return;
-        }
+    if (!res.ok) {
+      alert("Failed to update product");
+      return;
+    }
 
-        router.push("/dashboard");
-
+    router.push("/dashboard");
+    router.refresh(); // ✅ IMPORTANT: refresh SSR data
   }
 
   if (loading) return <p className="p-10">Loading...</p>;
@@ -109,7 +105,6 @@ export default function EditProductPage({
         />
       </div>
 
-      
       <div>
         <p className="text-sm mb-1">Change Image (optional)</p>
         <input

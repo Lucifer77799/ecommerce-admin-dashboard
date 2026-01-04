@@ -7,11 +7,9 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
 
-
 export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
-
 
 export async function comparePassword(
   password: string,
@@ -19,7 +17,6 @@ export async function comparePassword(
 ) {
   return await bcrypt.compare(password, hashedPassword);
 }
-
 
 export function createToken(payload: {
   id: string;
@@ -35,5 +32,7 @@ export function verifyToken(token: string) {
   return jwt.verify(token, JWT_SECRET) as {
     id: string;
     role: string;
+    iat: number;
+    exp: number;
   };
 }

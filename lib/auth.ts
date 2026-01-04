@@ -27,7 +27,7 @@ export function createToken(payload: {
   });
 }
 
-
+// API ROUTES ONLY should call this
 export function verifyToken(token: string) {
   return jwt.verify(token, JWT_SECRET) as {
     id: string;

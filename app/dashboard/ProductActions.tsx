@@ -1,14 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { mutate } from "swr";
 
 export default function ProductActions({ id }: { id: string }) {
   const router = useRouter();
 
   async function handleDelete() {
     if (!confirm("Delete this product?")) return;
-    await fetch(`/api/products/${id}`, { method: "DELETE" });
-    router.refresh();
+
+    await fetch(`/api/products/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    mutate("/api/products"); // ✅ SWR revalidation
   }
 
   return (

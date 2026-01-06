@@ -39,7 +39,6 @@ export default function EditProductPage({
     fetchProduct();
   }, [id]);
 
-  // IMAGE UPLOAD
   async function uploadImage(file: File) {
     const formData = new FormData();
     formData.append("file", file);
@@ -58,7 +57,6 @@ export default function EditProductPage({
     return data.url as string;
   }
 
-  // UPDATE PRODUCT (WITH ZOD VALIDATION)
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
@@ -104,8 +102,7 @@ export default function EditProductPage({
       return;
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    router.push("/dashboard"); // ✅ Step 6: no router.refresh()
   }
 
   if (loading) return <p className="p-10">Loading...</p>;

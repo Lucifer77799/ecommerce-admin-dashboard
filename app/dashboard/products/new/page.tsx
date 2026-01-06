@@ -36,18 +36,14 @@ export default function NewProductPage() {
     return data.url as string;
   }
 
-  // ✅ STEP 1 VALIDATION
   function validateStep1() {
-    const parsed = productSchema.pick({ name: true }).safeParse({
-      name,
-    });
+    const parsed = productSchema.pick({ name: true }).safeParse({ name });
 
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       parsed.error.issues.forEach((e) => {
         if (e.path[0]) errs[e.path[0].toString()] = e.message;
       });
-
       setErrors(errs);
       return false;
     }
@@ -56,7 +52,6 @@ export default function NewProductPage() {
     return true;
   }
 
-  // ✅ FINAL SUBMIT
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
@@ -78,7 +73,6 @@ export default function NewProductPage() {
       parsed.error.issues.forEach((e) => {
         if (e.path[0]) errs[e.path[0].toString()] = e.message;
       });
-
       setErrors(errs);
       return;
     }
@@ -90,9 +84,7 @@ export default function NewProductPage() {
 
       const res = await fetch("/api/products", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           ...parsed.data,
@@ -105,10 +97,7 @@ export default function NewProductPage() {
         return;
       }
 
-      router.push("/dashboard");
-      router.refresh();
-    } catch {
-      alert("Something went wrong");
+      router.push("/dashboard"); // ✅ Step 6: no router.refresh()
     } finally {
       setLoading(false);
     }
@@ -118,7 +107,6 @@ export default function NewProductPage() {
     <div className="p-10 max-w-xl">
       <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
 
-      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <input
@@ -158,7 +146,6 @@ export default function NewProductPage() {
         </div>
       )}
 
-      {/* STEP 2 */}
       {step === 2 && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

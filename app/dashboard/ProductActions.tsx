@@ -14,7 +14,7 @@ export default function ProductActions({ id }: { id: string }) {
       credentials: "include",
     });
 
-    mutate("/api/products"); // ✅ SWR revalidation
+    mutate("/api/products"); 
   }
 
   return (

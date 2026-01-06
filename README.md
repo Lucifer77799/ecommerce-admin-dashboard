@@ -143,7 +143,7 @@ These credentials are provided only for demonstration and evaluation purposes.
 
 🌍 Live Application: https://ecommerce-admin-dashboard-xi.vercel.app/login
 
-🎥 Demo Video: https://your-demo-video-link
+🎥 Demo Video: https://drive.google.com/file/d/1gH4kGTlBoBOHLQ0qX83iAaF6WziFjXnI/view?usp=sharing
 
 ---
 
